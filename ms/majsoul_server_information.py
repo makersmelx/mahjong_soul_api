@@ -2,9 +2,11 @@ import random
 import re
 from sys import stderr
 import requests
+import json
+import logging
 
 URL_BASE = 'https://game.maj-soul.com/1/'
-MAX_ATTEMPT_PER_SERVER = 2
+MAX_ATTEMPT_PER_SERVER = 5
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36"
 HEADERS = {
     "User-Agent": USER_AGENT,
@@ -15,9 +17,10 @@ HEADERS = {
 }
 
 
-def save_liqi_json(json_string: str):
+def save_liqi_json(liqi_json: dict):
     with open("setup/liqi.json", 'w+') as file:
-        file.write(json_string)
+        file.write(json.dumps(liqi_json))
+
 
 def get_endpoint_and_version():
     # Parts below are hard-coded according to mahjong soul api (2022-07-14)
@@ -29,29 +32,32 @@ def get_endpoint_and_version():
 
     def get_majsoul_resource(path: str):
         url = URL_BASE + path
-        return session.get(url).json()
+        for _ in range(MAX_ATTEMPT_PER_SERVER):
+            resp = session.get(url)
+            if resp.status_code == 200:
+                return resp.json()
+        logging.error("Just try again. Connection to Majsoul sucks from time to time.")
+        exit(1)
 
     try:
         ws_scheme = 'wss'
         version = get_majsoul_resource("version.json")
         resversion = get_majsoul_resource(
             'resversion{}.json'.format(version['version']))
-        liqi_json = resversion['res']["res/proto/liqi.json"]
-        protobuf_version = liqi_json['prefix']
-        protobuf_schema = get_majsoul_resource(
-            '{}/res/proto/liqi.json'.format(protobuf_version))
+        protobuf_version = resversion['res']["res/proto/liqi.json"]['prefix']
         config = get_majsoul_resource(
             '{}/config.json'.format(resversion['res']['config.json']['prefix']))
         ip_config = [x for x in config['ip'] if x['name'] == 'player'][0]
         # a list of urls where we can request for game server information
         request_game_server_endpoint_list = ip_config['region_urls']
     except KeyError as e:
-        print(e, stderr)
-        print("Majsoul api may have changed. Please notify the author.")
+        logging.error(e)
+        logging.warn("Majsoul api may have changed. Please notify the author.")
 
     last_error: Exception = None
 
     for attempt in range(len(request_game_server_endpoint_list) * MAX_ATTEMPT_PER_SERVER):
+        logging.info("attempt {}....try fetching majsoul server information".format(attempt))
         request_game_server_endpoint = request_game_server_endpoint_list[
             attempt // MAX_ATTEMPT_PER_SERVER]['url']
         # the final url where we request for game server info
@@ -64,7 +70,7 @@ def get_endpoint_and_version():
             game_server_info = session.get(request_game_server_endpoint).json()
             # check maintenance
             if 'maintenance' in game_server_info:
-                print("Majsoul is in maintenance")
+                logging.info("Majsoul is in maintenance")
                 return
 
             game_server_endpoint = random.choice(game_server_info["servers"])
@@ -75,16 +81,27 @@ def get_endpoint_and_version():
 
         except Exception as e:
             last_error = e
-            print(e, stderr)
+            logging.error(e)
             continue
 
     # failed to fetch game servers
     if last_error:
-        print(e, stderr)
-        raise last_error
+        logging.error(e)
+        exit(1)
+
     majsoul_version = "v" + re.sub(r'.[a-z]+$', "", version['version'])
     game_server_endpoint = "{}://{}/".format(ws_scheme, game_server_endpoint)
-    save_liqi_json(liqi_json)
+    logging.info("Endpoint: {}, Version: {}".format(
+        game_server_endpoint, majsoul_version))
+    try:
+        liqi_json = get_majsoul_resource(
+            '{}/res/proto/liqi.json'.format(protobuf_version))
+        logging.info("fetch liqi.json succeeds, writing into setup/liqi.json")
+        save_liqi_json(liqi_json)
+    except e:
+        logging.error("fetch liqi.json failed")
+        exit(1)
+
     return game_server_endpoint, majsoul_version
 
 

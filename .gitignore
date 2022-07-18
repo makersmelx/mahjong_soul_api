@@ -13,3 +13,6 @@ build/*
 
 temp
 temp.py
+
+**/liqi.json
+*.proto

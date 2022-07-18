@@ -263,6 +263,9 @@ class Lobby(MSRPCService):
         'receiveActivityGift': pb.ReqReceiveActivityGift,
         'fetchFriendFeedActivityData': pb.ReqFetchFriendFeedActivityData,
         'openPreChestItem': pb.ReqOpenPreChestItem,
+        'fetchVoteActivity': pb.ReqFetchVoteActivity,
+        'voteActivity': pb.ReqVoteActivity,
+        'logReport': pb.ReqLogReport,
     }
     _res = {
         'fetchConnectionInfo': pb.ResConnectionInfo,
@@ -519,6 +522,9 @@ class Lobby(MSRPCService):
         'receiveActivityGift': pb.ResCommon,
         'fetchFriendFeedActivityData': pb.ResFetchFriendFeedActivityData,
         'openPreChestItem': pb.ResOpenPreChestItem,
+        'fetchVoteActivity': pb.ResFetchVoteActivity,
+        'voteActivity': pb.ResVoteActivity,
+        'logReport': pb.ResCommon,
     }
 
     def get_package_name(self):
@@ -1294,6 +1300,15 @@ class Lobby(MSRPCService):
 
     async def open_pre_chest_item(self, req):
         return await self.call_method('openPreChestItem', req)
+
+    async def fetch_vote_activity(self, req):
+        return await self.call_method('fetchVoteActivity', req)
+
+    async def vote_activity(self, req):
+        return await self.call_method('voteActivity', req)
+
+    async def log_report(self, req):
+        return await self.call_method('logReport', req)
 
 
 class FastTest(MSRPCService):

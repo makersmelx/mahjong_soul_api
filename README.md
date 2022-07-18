@@ -29,15 +29,13 @@ poetry install
 1. Install protobuf compiler [`protoc`](https://grpc.io/docs/protoc-installation/)
 
 ### How to update protocol files to the new version
-
 It was tested on Ubuntu.
 
-1. Download the new `liqi.json` file from MS (find it in the network tab of your browser) and put it to `ms/liqi.json`
-1. `python generate_proto_file.py`
-1. `protoc --python_out=. protocol.proto`
-1. `chmod +x ms-plugin.py`
-1. `sudo cp ms-plugin.py /usr/bin/ms-plugin.py`
-1. `protoc --custom_out=. --plugin=protoc-gen-custom=ms-plugin.py ./protocol.proto`
+1. At the root directory
+~~~shell
+chmod +x ./setup.sh
+./setup.sh
+~~~
 
 
 ### How to update protocol files for manager API to the new version
