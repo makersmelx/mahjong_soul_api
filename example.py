@@ -10,6 +10,7 @@ import aiohttp
 
 from ms.base import MSRPCChannel
 from ms.rpc import Lobby
+from ms.majsoul_server_information import get_endpoint_and_version
 import ms.protocol_pb2 as pb
 from google.protobuf.json_format import MessageToJson
 
@@ -52,6 +53,7 @@ async def main():
 
 
 async def connect():
+    '''
     async with aiohttp.ClientSession() as session:
         async with session.get("{}/1/version.json".format(MS_HOST)) as res:
             version = await res.json()
@@ -72,10 +74,10 @@ async def connect():
             servers = servers["servers"]
             server = random.choice(servers)
             endpoint = "wss://{}/gateway".format(server)
-
+    '''
+    endpoint, version_to_force = get_endpoint_and_version()
     logging.info(f"Chosen endpoint: {endpoint}")
     channel = MSRPCChannel(endpoint)
-
     lobby = Lobby(channel)
 
     await channel.connect(MS_HOST)
