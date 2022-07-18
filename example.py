@@ -5,6 +5,7 @@ import logging
 import random
 import uuid
 from optparse import OptionParser
+import os
 
 import aiohttp
 
@@ -97,7 +98,7 @@ async def login(lobby, username, password, version_to_force):
 
     req = pb.ReqLogin()
     req.account = username
-    req.password = hmac.new(b"lailai", password.encode(),
+    req.password = hmac.new(os.environ.get('KEY').encode('UTF-8'), password.encode(),
                             hashlib.sha256).hexdigest()
     req.device.is_browser = True
     req.random_key = uuid_key

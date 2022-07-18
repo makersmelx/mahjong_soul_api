@@ -3,13 +3,17 @@ The idea of repository based on https://github.com/chaserhkj/PyMajSoul/
 Python wrappers for Majsoul allow you to interact with their servers from Python scripts.
 
 ## For User
+Before you start, you should
+- know the exact key for password encryption
+- keep in mind not to share or post to public
+**It is a severe security issue.**
 
 1. Install [`poetry`](https://python-poetry.org/)
 2. Install python packages from by running
 ~~~shell
 poetry install
 ~~~
-2. `poetry run python example.py -u username -p password`
+2. `KEY=/secret/key poetry run python example.py -u username -p password`
 
 This example is working only with **Python3.7+**.
 
