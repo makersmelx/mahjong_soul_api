@@ -19,6 +19,9 @@ If you want to login to EN or JP servers you need to write your code to authenti
 
 ## For Developer
 
+### Documents for reference
+1. Code behind [https://amae-koromo.sapk.ch/](https://amae-koromo.sapk.ch/): [SAPikachu/amae-koromo-scripts](https://github.com/SAPikachu/amae-koromo-scripts/blob/master/logGames.js)
+2. Api and protocol reference in Chinese: [takayama-lily/mjsoul](https://github.com/takayama-lily/mjsoul)
 ### Requirements
 
 1. Install [`poetry`](https://python-poetry.org/) using package manager
