@@ -4,8 +4,12 @@ Python wrappers for Majsoul allow you to interact with their servers from Python
 
 ## For User
 
-1. Install python packages from `requirements.txt`
-2. `python example.py -u username -p password`
+1. Install [`poetry`](https://python-poetry.org/)
+2. Install python packages from by running
+~~~shell
+poetry install
+~~~
+2. `poetry run python example.py -u username -p password`
 
 This example is working only with **Python3.7+**.
 
@@ -17,8 +21,12 @@ If you want to login to EN or JP servers you need to write your code to authenti
 
 ### Requirements
 
-1. Install python packages from `requerements.txt`
-1. Install protobuf compiler `sudo apt install protobuf-compiler`
+1. Install [`poetry`](https://python-poetry.org/) using package manager
+2. Install python packages from by running
+~~~shell
+poetry install
+~~~
+1. Install protobuf compiler [`protoc`](https://grpc.io/docs/protoc-installation/)
 
 ### How to update protocol files to the new version
 

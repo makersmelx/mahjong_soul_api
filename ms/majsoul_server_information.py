@@ -15,10 +15,9 @@ HEADERS = {
 }
 
 
-'''
-    Returns:
-'''
-
+def save_liqi_json(json_string: str):
+    with open("setup/liqi.json", 'w+') as file:
+        file.write(json_string)
 
 def get_endpoint_and_version():
     # Parts below are hard-coded according to mahjong soul api (2022-07-14)
@@ -37,7 +36,8 @@ def get_endpoint_and_version():
         version = get_majsoul_resource("version.json")
         resversion = get_majsoul_resource(
             'resversion{}.json'.format(version['version']))
-        protobuf_version = resversion['res']["res/proto/liqi.json"]['prefix']
+        liqi_json = resversion['res']["res/proto/liqi.json"]
+        protobuf_version = liqi_json['prefix']
         protobuf_schema = get_majsoul_resource(
             '{}/res/proto/liqi.json'.format(protobuf_version))
         config = get_majsoul_resource(
@@ -84,6 +84,7 @@ def get_endpoint_and_version():
         raise last_error
     majsoul_version = "v" + re.sub(r'.[a-z]+$', "", version['version'])
     game_server_endpoint = "{}://{}/".format(ws_scheme, game_server_endpoint)
+    save_liqi_json(liqi_json)
     return game_server_endpoint, majsoul_version
 
 
