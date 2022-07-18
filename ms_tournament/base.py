@@ -109,7 +109,8 @@ class MSRPCService:
 
     async def call_method(self, method, req):
         msg = req.SerializeToString()
-        name = '.{}.{}.{}'.format(self.get_package_name(), self.get_service_name(), method)
+        name = '.{}.{}.{}'.format(
+            self.get_package_name(), self.get_service_name(), method)
         res_msg = await self._channel.send_request(name, msg)
         res_class = self.get_res_class(method)
         res = res_class()

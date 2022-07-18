@@ -7,7 +7,7 @@ from ms_tournament.base import MSRPCService
 
 class CustomizedContestManagerApi(MSRPCService):
     version = None
-    
+
     _req = {
         'loginContestManager': pb.ReqContestManageLogin,
         'oauth2AuthContestManager': pb.ReqContestManageOauth2Auth,

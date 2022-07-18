@@ -20,12 +20,14 @@ logging.basicConfig(
 MS_HOST = "https://mahjongsoul.tournament.yo-star.com"
 MS_MANAGER_API_URL = "https://mjusgs.mahjongsoul.com:7988"
 
+
 async def main():
     """
     Login to the EN server with OAuth2 access token and get tournament list.
     """
     parser = OptionParser()
-    parser.add_option("-t", "--token", type="string", help="Access token for connect.")
+    parser.add_option("-t", "--token", type="string",
+                      help="Access token for connect.")
 
     opts, _ = parser.parse_args()
     access_token = opts.token
@@ -41,7 +43,7 @@ async def main():
 
 async def connect():
     async with aiohttp.ClientSession() as session:
-    	async with session.get("{}/api/customized_contest/random".format(MS_MANAGER_API_URL)) as res:
+        async with session.get("{}/api/customized_contest/random".format(MS_MANAGER_API_URL)) as res:
             servers = await res.json()
             endpoint_gate = servers['servers'][0]
             endpoint = "wss://{}/".format(endpoint_gate)
@@ -83,6 +85,7 @@ async def login(manager_api, access_token):
     logging.info("")
     return True
 
+
 async def load_tournaments_list(manager_api):
     logging.info("Loading tournament list...")
 
@@ -92,8 +95,8 @@ async def load_tournaments_list(manager_api):
     logging.info(f"found tournaments : {tournaments_count}")
 
     for i in range(0, tournaments_count):
-        logging.info("") 
-        logging.info(f"unique_id: {res.contests[i].unique_id}") 
+        logging.info("")
+        logging.info(f"unique_id: {res.contests[i].unique_id}")
         logging.info(f"contest_id: {res.contests[i].contest_id}")
         logging.info(f"contest_name: {res.contests[i].contest_name}")
 

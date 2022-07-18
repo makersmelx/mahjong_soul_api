@@ -14,7 +14,7 @@ from ms.base import MSRPCService
 cls_tplt = '''
 class {class_name}(MSRPCService):
     version = None
-    
+
     _req = {{
 {req_list}
     }}
@@ -64,9 +64,12 @@ def generate_code(request, response):
 
                 req_name = mtd.input_type.rsplit('.', 1)[-1]
                 res_name = mtd.output_type.rsplit('.', 1)[-1]
-                req_list.append(dict_template.format(method_name=method_name, type_name=req_name))
-                res_list.append(dict_template.format(method_name=method_name, type_name=res_name))
-                func_list.append(func_template.format(method_name=method_name, func_name=func_name))
+                req_list.append(dict_template.format(
+                    method_name=method_name, type_name=req_name))
+                res_list.append(dict_template.format(
+                    method_name=method_name, type_name=res_name))
+                func_list.append(func_template.format(
+                    method_name=method_name, func_name=func_name))
 
             cls = cls_tplt.format(package_name=package_name,
                                   class_name=class_name,

@@ -29,7 +29,8 @@ def parse_fields(fields):
             rule = fields[name]['rule'] + ' '
         else:
             rule = ''
-        write_line('{}{} {} = {};'.format(rule, fields[name]['type'], name, fields[name]['id']))
+        write_line('{}{} {} = {};'.format(
+            rule, fields[name]['type'], name, fields[name]['id']))
 
 
 def parse_methods(methods):

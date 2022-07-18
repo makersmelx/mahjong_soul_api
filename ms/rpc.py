@@ -7,7 +7,7 @@ from ms.base import MSRPCService
 
 class Lobby(MSRPCService):
     version = None
-    
+
     _req = {
         'fetchConnectionInfo': pb.ReqCommon,
         'signup': pb.ReqSignupAccount,
@@ -1298,7 +1298,7 @@ class Lobby(MSRPCService):
 
 class FastTest(MSRPCService):
     version = None
-    
+
     _req = {
         'authGame': pb.ReqAuthGame,
         'enterGame': pb.ReqCommon,
