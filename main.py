@@ -28,11 +28,14 @@ async def main():
     parser = OptionParser()
     parser.add_option("-l", "--log", type="string",
                       help="Your log UUID for load.")
+    parser.add_option("-c", "--config", type="string",
+                      help="Path to the config file to use")
 
     opts, _ = parser.parse_args()
     log_uuid = opts.log
+    config = opts.config
 
-    majsoul = await Majsoul()
+    majsoul = await Majsoul(config)
 
     if not log_uuid:
         game_logs = await load_game_logs(majsoul.lobby)

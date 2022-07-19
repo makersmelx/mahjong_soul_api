@@ -5,15 +5,17 @@ Python wrappers for Majsoul allow you to interact with their servers from Python
 ## For User
 Before you start, you should
 - know the exact key for password encryption
-- keep in mind not to share or post to public
-**It is a severe security issue.**
+- keep in mind not to share or post it to public
+- **It is a severe security issue.**
 
 1. Install [`poetry`](https://python-poetry.org/)
 2. Install python packages from by running
 ~~~shell
 poetry install
 ~~~
-2. `KEY=/secret/key poetry run python example.py -u username -p password`
+3. copy `examples/majsoul_bot.ini.example` into the root directory. Rename to `majsoul_bot.ini`. Edit the file with your own information.
+4. `poetry run python main.py`
+5. You can use your own config by adding `-c` or `--config` flag. like `poetry run python main.py -c /path/to/your/config`. Anyway, the file must be in `ini` format.
 
 This example is working only with **Python3.7+**.
 
