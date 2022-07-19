@@ -1,14 +1,10 @@
 import asyncio
-import hashlib
-import hmac
+import json
 import logging
-import uuid
-from optparse import OptionParser
-import os
 
-from ms.base import MSRPCChannel
-from ms.majsoul import Majsoul
-from ms.rpc import Lobby
+from optparse import OptionParser
+from urllib import response
+from ms.majsoul import Majsoul, MajsoulGameMode
 import ms.protocol_pb2 as pb
 from google.protobuf.json_format import MessageToJson
 
@@ -44,6 +40,7 @@ async def main():
         game_log = await load_and_process_game_log(majsoul.lobby, log_uuid)
         logging.info("game {} result : \n{}".format(
             game_log.head.uuid, game_log.head.result))
+
 
 async def load_game_logs(lobby):
     logging.info("Loading game logs")

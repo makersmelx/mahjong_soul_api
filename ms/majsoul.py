@@ -1,5 +1,6 @@
 import asyncio
 import configparser
+from enum import IntEnum
 import hashlib
 import hmac
 import logging
@@ -13,6 +14,30 @@ import ms.protocol_pb2 as pb
 
 MS_HOST = "https://game.maj-soul.com"
 DEFAULT_CONFIG_PATH = "./majsoul_bot.ini"
+
+
+class MajsoulGameMode(IntEnum):
+    # 4-player South
+    Throne_4p_South = 216
+    Jade_4p_South = 212
+    Gold_4p_South = 209
+
+    # 4-player East
+    Throne_4p_East = 215
+    Jade_4p_East = 211
+    Gold_4p_East = 208
+
+    # 3-player South
+    Throne_3p_South = 226
+    Jade_3p_South = 224
+    Gold_3p_South = 222
+
+    # 3-player East
+    Throne_3p_East = 225
+    Jade_3p_East = 223
+    Gold_3p_East = 221
+
+    # todo: implement __str__
 
 
 class Majsoul:
@@ -30,7 +55,14 @@ class Majsoul:
 
     async def __init__(self, config_path=DEFAULT_CONFIG_PATH):
         self.initialize_config(config_path)
-        await self.initialize_connection()
+        await self.establish_connection()
+
+    async def fetch_live_game_list(self, mode: MajsoulGameMode):
+        logging.info("fetching game live list...")
+        request = pb.ReqGameLiveList()
+        request.filter_id = int(mode)
+        response = await self.lobby.fetch_game_live_list(request)
+        return response
 
     # Since destructor cannot be an async task, use event_loop to wait for clean up
     # stackoverflow: https://stackoverflow.com/a/67577364
@@ -42,7 +74,7 @@ class Majsoul:
             else:
                 loop.run_until_complete(self.clean_up())
         except Exception as err:
-            logging.warn(f"Clean up fails: {err}")
+            logging.warn(f"Clean up fails")
             pass
     '''
     Clean up for the destructor
@@ -50,7 +82,7 @@ class Majsoul:
     async def clean_up(self):
         await self.channel.close()
 
-    async def initialize_connection(self) -> None:
+    async def establish_connection(self) -> None:
         endpoint, version, _ = get_game_server_info()
         logging.info(f"Chosen endpoint: {endpoint}")
         self.channel = MSRPCChannel(endpoint)
