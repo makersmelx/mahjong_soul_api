@@ -2,25 +2,23 @@ import asyncio
 import hashlib
 import hmac
 import logging
-import random
 import uuid
 from optparse import OptionParser
 import os
 
-import aiohttp
-
 from ms.base import MSRPCChannel
+from ms.majsoul import Majsoul
 from ms.rpc import Lobby
-from ms.majsoul_server_information import get_endpoint_and_version
 import ms.protocol_pb2 as pb
 from google.protobuf.json_format import MessageToJson
 
+MS_HOST = "https://game.maj-soul.com"
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
 )
-
-MS_HOST = "https://game.maj-soul.com"
 
 
 async def main():
@@ -28,93 +26,21 @@ async def main():
     Login to the CN server with username and password and get latest 30 game logs.
     """
     parser = OptionParser()
-    parser.add_option("-u", "--username", type="string",
-                      help="Your account name.")
-    parser.add_option("-p", "--password", type="string",
-                      help="Your account password.")
     parser.add_option("-l", "--log", type="string",
                       help="Your log UUID for load.")
 
     opts, _ = parser.parse_args()
-    username = opts.username
-    password = opts.password
     log_uuid = opts.log
 
-    if not username or not password:
-        parser.error("Username or password cant be empty")
-
-    lobby, channel, version_to_force = await connect()
-    await login(lobby, username, password, version_to_force)
+    majsoul = await Majsoul()
 
     if not log_uuid:
-        game_logs = await load_game_logs(lobby)
+        game_logs = await load_game_logs(majsoul.lobby)
         logging.info("Found {} records".format(len(game_logs)))
     else:
-        game_log = await load_and_process_game_log(lobby, log_uuid)
+        game_log = await load_and_process_game_log(majsoul.lobby, log_uuid)
         logging.info("game {} result : \n{}".format(
             game_log.head.uuid, game_log.head.result))
-
-    await channel.close()
-
-
-async def connect():
-    '''
-    async with aiohttp.ClientSession() as session:
-        async with session.get("{}/1/version.json".format(MS_HOST)) as res:
-            version = await res.json()
-            logging.info(f"Version: {version}")
-            version = version["version"]
-            version_to_force = version.replace(".w", "")
-
-        async with session.get("{}/1/v{}/config.json".format(MS_HOST, version)) as res:
-            config = await res.json()
-            logging.info(f"Config: {config}")
-
-            url = config["ip"][0]["region_urls"][1]["url"]
-
-        async with session.get(url + "?service=ws-gateway&protocol=ws&ssl=true") as res:
-            servers = await res.json()
-            logging.info(f"Available servers: {servers}")
-
-            servers = servers["servers"]
-            server = random.choice(servers)
-            endpoint = "wss://{}/gateway".format(server)
-    '''
-    endpoint, version_to_force = get_endpoint_and_version()
-    logging.info(f"Chosen endpoint: {endpoint}")
-    channel = MSRPCChannel(endpoint)
-    lobby = Lobby(channel)
-
-    await channel.connect(MS_HOST)
-    logging.info("Connection was established")
-
-    return lobby, channel, version_to_force
-
-
-async def login(lobby, username, password, version_to_force):
-    logging.info("Login with username and password")
-
-    uuid_key = str(uuid.uuid1())
-
-    req = pb.ReqLogin()
-    req.account = username
-    req.password = hmac.new(os.environ.get('KEY').encode('UTF-8'), password.encode(),
-                            hashlib.sha256).hexdigest()
-    req.device.is_browser = True
-    req.random_key = uuid_key
-    req.gen_access_token = True
-    req.client_version_string = f"web-{version_to_force}"
-    req.currency_platforms.append(2)
-
-    res = await lobby.login(req)
-    token = res.access_token
-    if not token:
-        logging.error("Login Error:")
-        logging.error(res)
-        return False
-
-    return True
-
 
 async def load_game_logs(lobby):
     logging.info("Loading game logs")

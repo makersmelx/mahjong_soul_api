@@ -11,7 +11,7 @@ else
 fi
 
 echo "Fetching protobuf descriptor \"liqi.json\"..."
-poetry run "${PYTHON}" ms/majsoul_server_information.py || exit 1
+poetry run "${PYTHON}" ms/server_info.py || exit 1
 cd setup
 echo "Compiling protobuf python code..."
 poetry run "${PYTHON}" generate_proto_file.py || exit 1
